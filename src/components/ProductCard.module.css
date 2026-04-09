@@ -1,0 +1,128 @@
+.card {
+  background: var(--bg);
+  padding: 40px 32px;
+  cursor: pointer;
+  transition: background 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  background: var(--surface);
+}
+
+.iconArea {
+  width: 100%;
+  max-width: 200px;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.pulseRing {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 0.5px solid var(--sage);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.card:hover .pulseRing {
+  opacity: 1;
+  animation: pulseRing 1.8s ease-out infinite;
+}
+
+@keyframes pulseRing {
+  0%   { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+.circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 0.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.3s;
+}
+
+.card:hover .circle {
+  border-color: var(--sage);
+}
+
+.circleInner {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+}
+
+.p1 .circleInner { background: rgba(74, 90, 58, 0.4); }
+.p2 .circleInner { background: rgba(138, 158, 114, 0.3); }
+.p3 .circleInner { background: rgba(200, 169, 110, 0.2); }
+
+.tag {
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin-bottom: 8px;
+}
+
+.name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 300;
+  color: var(--cream);
+  margin-bottom: 10px;
+}
+
+.desc {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--cream-dim);
+  font-weight: 300;
+  margin-bottom: 20px;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  color: var(--cream);
+  font-weight: 300;
+}
+
+.add {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 0.5px solid var(--border);
+  background: none;
+  cursor: pointer;
+  color: var(--cream-dim);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1;
+}
+
+.add:hover {
+  border-color: var(--sage);
+  color: var(--sage);
+  background: rgba(138, 158, 114, 0.08);
+}

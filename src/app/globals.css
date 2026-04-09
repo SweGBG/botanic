@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #0C0A08;
+  --bg2: #131008;
+  --surface: #1A1610;
+  --surface2: #221D16;
+  --moss: #4A5A3A;
+  --sage: #8A9E72;
+  --sage-light: #B8CC9E;
+  --cream: #F0EAD8;
+  --cream-dim: #9A9282;
+  --gold: #C8A96E;
+  --gold-dim: #7A6540;
+  --border: rgba(200, 169, 110, 0.12);
+  --border-hover: rgba(200, 169, 110, 0.28);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+@keyframes shimmer {
+  0%   { opacity: 0.4; }
+  50%  { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes pulseRing {
+  0%   { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.anim-1 { animation: fadeUp 0.8s 0.0s ease both; }
+.anim-2 { animation: fadeUp 0.8s 0.15s ease both; }
+.anim-3 { animation: fadeUp 0.8s 0.3s ease both; }
+.anim-4 { animation: fadeUp 0.8s 0.45s ease both; }
+.anim-5 { animation: fadeUp 0.8s 0.6s ease both; }

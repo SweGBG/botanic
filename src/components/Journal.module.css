@@ -1,0 +1,121 @@
+.section {
+  padding: 80px 48px;
+  border-top: 0.5px solid var(--border);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 48px;
+}
+
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin-bottom: 10px;
+}
+
+.title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 38px;
+  font-weight: 300;
+  color: var(--cream);
+}
+
+.link {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+  text-decoration: none;
+  border-bottom: 0.5px solid var(--gold-dim);
+  padding-bottom: 2px;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.link:hover {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.card {
+  cursor: pointer;
+}
+
+.imgWrap {
+  aspect-ratio: 4 / 3;
+  margin-bottom: 20px;
+  border: 0.5px solid var(--border);
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.card:hover .imgWrap {
+  border-color: var(--sage);
+}
+
+.imgInner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.j1 .imgInner { background: rgba(74, 90, 58, 0.25); }
+.j2 .imgInner { background: rgba(200, 169, 110, 0.12); }
+.j3 .imgInner { background: rgba(138, 158, 114, 0.18); }
+
+.roman {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 52px;
+  font-style: italic;
+  color: rgba(240, 234, 216, 0.08);
+  user-select: none;
+}
+
+.cat {
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin-bottom: 8px;
+}
+
+.postTitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--cream);
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+
+.date {
+  font-size: 11px;
+  color: var(--cream-dim);
+  font-weight: 300;
+}
+
+@media (max-width: 900px) {
+  .section {
+    padding: 60px 24px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .header {
+    flex-direction: column;
+    gap: 12px;
+  }
+}

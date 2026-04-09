@@ -1,0 +1,38 @@
+.wrap {
+  border-top: 0.5px solid var(--border);
+  border-bottom: 0.5px solid var(--border);
+  padding: 14px 0;
+  overflow: hidden;
+}
+
+.track {
+  display: flex;
+  gap: 0;
+  animation: marquee 22s linear infinite;
+  width: max-content;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.item {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 0 32px;
+}
+
+.dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--sage);
+  flex-shrink: 0;
+}
