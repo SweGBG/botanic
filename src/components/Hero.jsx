@@ -21,7 +21,7 @@ export default function Hero() {
           the intelligence of plants, distilled.
         </p>
         <div className={`${styles.btns} anim-4`}>
-          <button className={styles.btnPrimary}>Discover the ritual</button>
+          <a href="/discover" className={styles.btnPrimary}>Discover the ritual</a>
           <button className={styles.btnText}>Our ingredients</button>
         </div>
       </div>
