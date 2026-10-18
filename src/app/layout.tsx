@@ -22,8 +22,11 @@ export const viewport: Viewport = { themeColor: "#0b0e0a" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="sv">
+    <html lang="sv" className="crintro-wait" suppressHydrationWarning>
       <body>
+        <noscript>
+          <style>{`.crintro-loader{display:none!important}html.crintro-wait{overflow:auto}html.crintro-wait [data-crintro-hold],html.crintro-wait [data-crintro-hold] *{animation-play-state:running!important}`}</style>
+        </noscript>
         <LangProvider>
           <Nav />
           {children}

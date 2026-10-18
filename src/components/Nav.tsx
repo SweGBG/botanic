@@ -36,7 +36,7 @@ export default function Nav() {
   }, [open]);
 
   return (
-    <header className={`nav${scrolled ? " scrolled" : ""}`}>
+    <header className={`nav${scrolled ? " scrolled" : ""}`} data-crintro-hold>
       <Link href="/" className="brand" onClick={() => setOpen(false)}>
         <span className="brand-orb">
           <Leaf className="brand-leaf" />

@@ -17,6 +17,8 @@ export default function Motion() {
 
   useEffect(() => {
     const root = document.documentElement;
+    // pages without the CRiNTRO Loader (e.g. /discover opened directly) must not stay held
+    if (!document.querySelector(".crintro-loader")) root.classList.remove("crintro-wait");
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const revealIO = new IntersectionObserver(

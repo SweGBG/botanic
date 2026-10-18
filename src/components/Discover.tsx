@@ -4,7 +4,6 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { Mat, useLang } from "./Lang";
 import { LayerStack } from "./Sections";
-import { BURST_FRAMES } from "./Burst";
 
 function Count({ to, suffix }: { to: number; suffix: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -47,7 +46,7 @@ export default function Discover() {
           <span className="glow g2" />
           <span className="grain" />
         </div>
-        <img className="d-open-photo" src={`/burst/d/${String(BURST_FRAMES).padStart(4, "0")}.webp`} alt="" aria-hidden />
+        <img className="d-open-photo" src="/burst/d2/0120.webp" alt="" aria-hidden />
         <div className="d-open-left">
           <p className="eyebrow hero-in" style={{ "--wd": ".2s" } as CSSProperties}>
             <span className="eyebrow-line" />

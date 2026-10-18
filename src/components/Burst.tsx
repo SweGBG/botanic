@@ -3,18 +3,18 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { Mat, useLang } from "./Lang";
+import { crintro, nearestFrame, onCrintro, wantFrame } from "@/lib/crintro";
 
 /**
  * HERO — scroll-scrubbed video, Apple-style.
  * A video (start frame → exploded end frame) is cut into WebP frames:
- *   /public/burst/d/0001.webp …  (desktop, 16:9)
- *   /public/burst/m/0001.webp …  (mobile, smaller)
+ *   /public/burst/d2/0001.webp …  (desktop, 1920 px, Real-ESRGAN upscaled)
+ *   /public/burst/m2/0001.webp …  (mobile, 960 px)
+ * Loading is done by the CRiNTRO Loader (src/lib/crintro.ts), which streams them in priority order.
  * The section is tall; its stage is sticky and a canvas draws the frame matching scroll progress.
  * It is the first thing you see: an intro (headline, lead, CTAs) sits on the intact bottle, and
  * as you scroll the intro dissolves and the bottle opens while three short lines take over.
- * Frame 1 is the LCP poster; the rest stream in coarse-to-fine right after first paint.
  */
-export const BURST_FRAMES = 120;
 const pad = (n: number) => String(n).padStart(4, "0");
 
 /** Cut-off 14:00 Mon–Fri, computed in Europe/Stockholm. */
@@ -66,65 +66,50 @@ export default function Burst() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // The CRiNTRO Loader is already downloading the film (sharp 1920/960 px frames) in priority order;
+    // this scene only draws the decoded frame nearest the scroll position.
+    const store = crintro();
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const set = window.matchMedia("(max-width: 760px)").matches ? "m" : "d";
-    const frames: (HTMLImageElement | null)[] = new Array(BURST_FRAMES).fill(null);
-    let count = 0;
-    let alive = true;
-
-    const load = (i: number) =>
-      new Promise<void>((res) => {
-        if (frames[i]) return res();
-        const img = new Image();
-        img.decoding = "async";
-        img.src = `/burst/${set}/${pad(i + 1)}.webp`;
-        img.onload = () => {
-          frames[i] = img;
-          count++;
-          if (alive && (count % 4 === 0 || count === BURST_FRAMES)) setLoaded(count);
-          res();
-        };
-        img.onerror = () => res();
-      });
+    const set = store.set;
+    const off = onCrintro(() => setLoaded(Math.round(store.all * 100)));
 
     let w = 0,
       h = 0,
-      lastDrawn = -1,
       target = 0,
       current = 0,
-      raf = 0;
+      raf = 0,
+      last = performance.now(),
+      shown = false;
+    let lastImg: CanvasImageSource | null = null;
 
-    const nearestLoaded = (i: number) => {
-      for (let d = 0; d < BURST_FRAMES; d++) {
-        if (frames[i - d]) return i - d;
-        if (frames[i + d]) return i + d;
-      }
-      return -1;
-    };
-    const draw = (i: number, force = false) => {
-      const k = nearestLoaded(i);
-      if (k < 0 || (!force && k === lastDrawn)) return;
-      const img = frames[k]!;
-      // cover-fit, biased slightly upward so the bottle sits above the headline
-      let s = Math.max(w / img.naturalWidth, h / img.naturalHeight);
-      let dy: number;
+    const draw = (i: number) => {
+      if (!store.count) return;
+      wantFrame(i);
+      const img = nearestFrame(i);
+      if (!img || img === lastImg) return;
+      lastImg = img;
+      const iw = img.width,
+        ih = img.height;
+      let s: number, dy: number;
+      ctx.fillStyle = "#070906";
+      ctx.fillRect(0, 0, w, h);
       if (set === "m") {
         // phones: bottle in the upper band (6–70 %) so intro + headlines get their own dark band below
-        s = Math.max(w / img.naturalWidth, (h * 0.64) / img.naturalHeight);
+        s = Math.max(w / iw, (h * 0.64) / ih);
         dy = h * 0.06;
-        ctx.fillStyle = "#070906";
-        ctx.fillRect(0, 0, w, h);
       } else {
         // desktop: ~8% breathing room on top so the lifted cap clears the nav; anchored to the bottom
-        s = Math.max(w / img.naturalWidth, (h * 0.92) / img.naturalHeight);
-        dy = h - img.naturalHeight * s;
-        ctx.fillStyle = "#070906";
-        ctx.fillRect(0, 0, w, h);
+        s = Math.max(w / iw, (h * 0.92) / ih);
+        dy = h - ih * s;
       }
-      const dw = img.naturalWidth * s,
-        dh = img.naturalHeight * s;
+      const dw = iw * s,
+        dh = ih * s;
+      ctx.imageSmoothingQuality = "high";
       ctx.drawImage(img, (w - dw) / 2, dy, dw, dh);
-      lastDrawn = k;
+      if (!shown) {
+        shown = true;
+        setReady(true);
+      }
     };
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -133,69 +118,55 @@ export default function Burst() {
       h = Math.max(1, Math.round(r.height * dpr));
       canvas.width = w;
       canvas.height = h;
-      draw(Math.round(current), true);
+      lastImg = null;
+      draw(Math.round(current));
     };
 
-    const tick = () => {
-      // ease toward the target frame so scrubbing feels like film, not a flip-book
-      current += (target - current) * 0.16;
+    // game loop: time-based easing (same feel at 60 and 120 Hz), never draws from the scroll event
+    const tick = (now: number) => {
+      const dt = Math.min(0.1, (now - last) / 1000);
+      last = now;
+      current += (target - current) * (reduced ? 1 : 1 - Math.pow(0.84, dt * 60));
       if (Math.abs(target - current) < 0.04) current = target;
       draw(Math.round(current));
-      raf = current !== target ? requestAnimationFrame(tick) : 0;
+      raf = requestAnimationFrame(tick);
     };
+    let lastStep = "";
     const onScroll = () => {
       const r = section.getBoundingClientRect();
       const total = r.height - window.innerHeight;
       const p = reduced ? 0 : Math.min(1, Math.max(0, total > 0 ? -r.top / total : 0));
       section.style.setProperty("--bp", p.toFixed(3));
       // 0–14 %: intro; then the three burst lines share the rest
-      section.dataset.step = p < 0.14 ? "intro" : String(Math.min(2, Math.floor(((p - 0.14) / 0.86) * 3.15)));
-      target = p * (BURST_FRAMES - 1);
-      if (!raf) raf = requestAnimationFrame(tick);
+      const step = p < 0.14 ? "intro" : String(Math.min(2, Math.floor(((p - 0.14) / 0.86) * 3.15)));
+      if (step !== lastStep) section.dataset.step = lastStep = step;
+      target = p * Math.max(0, store.count - 1);
     };
 
-    const start = async () => {
-      await load(0);
-      resize();
-      setReady(true);
-      if (reduced) return;
-      const order: number[] = [];
-      const seen = new Set<number>();
-      for (const step of [12, 6, 3, 1])
-        for (let i = 0; i < BURST_FRAMES; i += step)
-          if (!seen.has(i)) {
-            seen.add(i);
-            order.push(i);
-          }
-      if (!seen.has(BURST_FRAMES - 1)) order.splice(1, 0, BURST_FRAMES - 1);
-      for (let k = 0; k < order.length && alive; k += 6) {
-        await Promise.all(order.slice(k, k + 6).map(load));
-        draw(Math.round(current), true);
-      }
-    };
-
-    start();
-
+    resize();
     onScroll();
+    const offCount = onCrintro(onScroll); // frame count arrives with the manifest
+    raf = requestAnimationFrame(tick);
     window.addEventListener("resize", resize);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
-      alive = false;
+      off();
+      offCount();
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
       window.removeEventListener("scroll", onScroll);
     };
   }, []);
 
-  const pct = Math.round((loaded / BURST_FRAMES) * 100);
+  const pct = loaded;
 
   return (
     <section className="burst" ref={sectionRef} data-step="intro" aria-label={t.burst.aria}>
       <div className="burst-stage">
         {/* poster: visible instantly, also for no-JS; the canvas fades in over it */}
         <picture>
-          <source media="(max-width: 760px)" srcSet={`/burst/m/${pad(1)}.webp`} />
-          <img className="burst-poster" src={`/burst/d/${pad(1)}.webp`} alt="" aria-hidden fetchPriority="high" />
+          <source media="(max-width: 760px)" srcSet={`/burst/m2/${pad(1)}.webp`} />
+          <img className="burst-poster" src={`/burst/d2/${pad(1)}.webp`} alt="" aria-hidden fetchPriority="high" />
         </picture>
         <canvas ref={canvasRef} className={`burst-canvas${ready ? " ready" : ""}`} aria-hidden />
         <span className="burst-vignette" aria-hidden />
@@ -209,7 +180,7 @@ export default function Burst() {
             <circle cx="18" cy="18" r="16" className="lp" />
           </svg>
         </div>
-        <div className="burst-intro">
+        <div className="burst-intro" data-crintro-hold>
           <p className="eyebrow hero-in" style={{ "--wd": ".2s" } as CSSProperties}>
             <span className="eyebrow-line" />
             {t.hero.eyebrow}

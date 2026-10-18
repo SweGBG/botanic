@@ -1,0 +1,179 @@
+/* CRiNTRO Loader — "Herbarium at dusk": night forest, the leaf draws itself, gold thread = real loading */
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(55% 40% at 50% 58%, rgba(200, 169, 110, 0.1), transparent 70%),
+    radial-gradient(80% 60% at 50% 110%, rgba(74, 90, 58, 0.35), transparent 70%),
+    #070906;
+  transition: clip-path 1s var(--ease), opacity 0.9s var(--ease), visibility 0s 1s;
+  clip-path: inset(0 0 0 0);
+}
+.out {
+  clip-path: inset(0 0 100% 0);
+  opacity: 0.4;
+  visibility: hidden;
+  pointer-events: none;
+}
+.inner {
+  display: grid;
+  justify-items: center;
+  gap: 1.15rem;
+  padding: 0 1.25rem;
+  text-align: center;
+}
+
+.leaf {
+  width: clamp(44px, 6vw, 60px);
+  height: auto;
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 10px rgba(200, 169, 110, 0.35));
+}
+.leaf path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 1.2s 0.05s var(--ease) forwards;
+}
+.leaf .vein {
+  stroke: var(--sage-l);
+  animation-delay: 0.55s;
+}
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.word {
+  display: flex;
+  font: 300 clamp(2.9rem, 11vw, 6.6rem) / 0.95 var(--serif);
+  letter-spacing: -0.015em;
+}
+.word span {
+  display: inline-flex;
+}
+.word i {
+  font-style: normal;
+  color: var(--cream);
+  opacity: 0;
+  filter: blur(10px);
+  transform: translateY(0.14em);
+  animation: bloom 1s var(--ease) forwards;
+}
+.accent i {
+  font-style: italic;
+  background: linear-gradient(100deg, var(--sage-l) 0 30%, var(--gold-l) 55%, var(--gold) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@keyframes bloom {
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+/* The thread = real loading: moss → sage → gold, a dew drop at the tip */
+.track {
+  container-type: inline-size;
+  position: relative;
+  width: min(15rem, 60vw);
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(240, 234, 216, 0.08);
+}
+.fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  will-change: transform;
+  background: linear-gradient(90deg, var(--moss2), var(--sage) 40%, var(--gold) 78%, var(--gold-l));
+  background-size: 100% 100%;
+  box-shadow: 0 0 10px rgba(200, 169, 110, 0.45);
+}
+.tip {
+  position: absolute;
+  left: -4px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  border-radius: 50%;
+  opacity: 0;
+  will-change: transform;
+  background: radial-gradient(circle at 35% 35%, #fffbe9 0 22%, rgba(234, 214, 162, 0.9) 45%, rgba(200, 169, 110, 0) 72%);
+  transition: opacity 0.3s;
+}
+/* still loading on a slow line: a gold sheen glides along the thread and the dew drop breathes */
+.wait .fill {
+  background: linear-gradient(90deg, var(--moss2), var(--sage) 30%, var(--gold) 45%, #fff3cf 50%, var(--gold) 55%, var(--sage) 70%, var(--gold-l));
+  background-size: 300% 100%;
+  animation: sheen 1.8s linear infinite;
+}
+.wait .tip {
+  animation: breathe 1.2s ease-in-out infinite;
+}
+@keyframes sheen {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+@keyframes breathe {
+  50% {
+    scale: 1.7;
+  }
+}
+
+.sub {
+  font: 400 0.72rem/1.2 var(--sans);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+  opacity: 0;
+  animation: fadeIn 0.9s 1s var(--ease) forwards;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 0.85;
+    transform: none;
+  }
+}
+
+@keyframes bloomLite {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (max-width: 760px) {
+  .word i {
+    filter: none; /* animated blur is the most expensive thing to paint on phones */
+    animation-name: bloomLite;
+  }
+  .leaf {
+    filter: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .loader {
+    display: none;
+  }
+}
