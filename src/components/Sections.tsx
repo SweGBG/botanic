@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, type CSSProperties, type FormEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import Link from "next/link";
 import { Mat, useLang } from "./Lang";
 import { Leaf } from "./Nav";
+import { plantNotes, plantUi } from "@/lib/plants";
 
 /* ---------- Ticker ---------- */
 export function Ticker() {
@@ -27,7 +28,9 @@ export function Ticker() {
 const LATIN = ["Rosa canina", "Psoralea corylifolia", "Sclerocarya birrea", "Betula pendula", "Camellia sinensis", "Hippophaë rhamnoides"];
 
 export function Plants() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
+  const [open, setOpen] = useState<number | null>(null);
+  const ui = plantUi[lang];
   return (
     <section className="plants" id="vaxter" data-anim>
       <div className="plants-head reveal">
@@ -41,15 +44,150 @@ export function Plants() {
       <ol className="herbarium">
         {t.dna.labels.map((name, i) => (
           <li key={name} className="specimen reveal" style={{ "--k": i } as CSSProperties}>
-            <span className="specimen-no">{String(i + 1).padStart(2, "0")}</span>
-            <span className="specimen-name">{name}</span>
-            <span className="specimen-latin">{LATIN[i]}</span>
-            <span className="specimen-rule" aria-hidden />
-            <span className="specimen-note">{t.dna.notes[i]}</span>
+            <button type="button" className="specimen-btn" onClick={() => setOpen(i)} aria-haspopup="dialog">
+              <span className="specimen-no">{String(i + 1).padStart(2, "0")}</span>
+              <span className="specimen-name">{name}</span>
+              <span className="specimen-latin">{LATIN[i]}</span>
+              <span className="specimen-rule" aria-hidden />
+              <span className="specimen-note">{t.dna.notes[i]}</span>
+              <span className="specimen-more">
+                {ui.more} <i aria-hidden>+</i>
+              </span>
+            </button>
           </li>
         ))}
       </ol>
+      <PlantDialog index={open} onIndex={setOpen} />
     </section>
+  );
+}
+
+/** Herbarium pop-up: one plant at a time, with a pressed-specimen image and field notes. */
+function PlantDialog({ index, onIndex }: { index: number | null; onIndex: (i: number | null) => void }) {
+  const { t, lang } = useLang();
+  const ref = useRef<HTMLDialogElement>(null);
+  const ui = plantUi[lang];
+  const notes = plantNotes[lang];
+  const n = notes.length;
+  // keep the last plant on screen while the dialog fades out
+  const [shown, setShown] = useState(0);
+  if (index !== null && index !== shown) setShown(index);
+
+  useEffect(() => {
+    const d = ref.current;
+    if (!d) return;
+    if (index !== null && !d.open) {
+      d.showModal();
+      document.documentElement.classList.add("dlg-open");
+    }
+    if (index === null && d.open) {
+      d.classList.add("closing");
+      const id = window.setTimeout(() => {
+        d.classList.remove("closing");
+        d.close();
+      }, 320);
+      return () => window.clearTimeout(id);
+    }
+  }, [index]);
+
+  useEffect(() => {
+    const d = ref.current;
+    if (!d) return;
+    const onClose = () => {
+      document.documentElement.classList.remove("dlg-open");
+      onIndex(null);
+    };
+    const onCancel = (e: Event) => {
+      e.preventDefault();
+      onIndex(null);
+    };
+    d.addEventListener("close", onClose);
+    d.addEventListener("cancel", onCancel);
+    return () => {
+      d.removeEventListener("close", onClose);
+      d.removeEventListener("cancel", onCancel);
+    };
+  }, [onIndex]);
+
+  const go = (step: number) => onIndex((shown + step + n) % n);
+  const p = notes[shown];
+
+  // Arrow keys flip between plants (on window: the card remounts on each flip, so focus may leave it).
+  useEffect(() => {
+    if (index === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") onIndex((index + 1) % n);
+      if (e.key === "ArrowLeft") onIndex((index - 1 + n) % n);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [index, n, onIndex]);
+
+  return (
+    <dialog
+      ref={ref}
+      className="plant-dlg"
+      aria-labelledby="plant-dlg-name"
+      onClick={(e) => e.target === ref.current && onIndex(null)}
+    >
+      <div className="plant-card" key={shown}>
+        <svg className="plant-frame" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
+          <rect x="1.2" y="1.2" width="97.6" height="97.6" rx="1.5" />
+        </svg>
+        <button type="button" className="plant-x" onClick={() => onIndex(null)} aria-label={ui.close}>
+          <svg viewBox="0 0 24 24" aria-hidden>
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+
+        <figure className="plant-fig">
+          <span className="plant-halo" aria-hidden />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={p.img} alt={t.dna.labels[shown]} />
+          <figcaption>
+            <i>{LATIN[shown]}</i>
+            <span>№ {String(shown + 1).padStart(2, "0")}</span>
+          </figcaption>
+        </figure>
+
+        <div className="plant-text">
+          <p className="plant-no">{String(shown + 1).padStart(2, "0")} / {String(n).padStart(2, "0")}</p>
+          <h3 id="plant-dlg-name" className="plant-name">{t.dna.labels[shown]}</h3>
+          <p className="plant-latin">{LATIN[shown]}</p>
+          <span className="plant-rule" aria-hidden />
+          <p className="plant-key">{t.dna.notes[shown]}</p>
+          <p className="plant-body">{p.body}</p>
+          <dl className="plant-facts">
+            {p.facts.map(([k, v]) => (
+              <div key={k}>
+                <dt>{k}</dt>
+                <dd>{v}</dd>
+              </div>
+            ))}
+          </dl>
+          <aside className="plant-did">
+            <Leaf className="plant-did-leaf" />
+            <div>
+              <strong>{ui.did}</strong>
+              <p>{p.did}</p>
+            </div>
+          </aside>
+          <div className="plant-nav">
+            <button type="button" onClick={() => go(-1)} aria-label={ui.prev}>
+              <svg viewBox="0 0 24 24" aria-hidden><path d="M15 6l-6 6 6 6" /></svg>
+            </button>
+            <span className="plant-dots" aria-hidden>
+              {notes.map((_, k) => (
+                <i key={k} className={k === shown ? "on" : ""} />
+              ))}
+            </span>
+            <button type="button" onClick={() => go(1)} aria-label={ui.next}>
+              <svg viewBox="0 0 24 24" aria-hidden><path d="M9 6l6 6-6 6" /></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </dialog>
   );
 }
 
