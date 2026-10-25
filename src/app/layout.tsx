@@ -11,6 +11,7 @@ import "./globals.css";
 import { LangProvider } from "@/components/Lang";
 import Motion from "@/components/Motion";
 import Nav from "@/components/Nav";
+import { CartProvider } from "@/components/Cart";
 import { Footer } from "@/components/Sections";
 
 export const metadata: Metadata = {
@@ -28,10 +29,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <style>{`.crintro-loader{display:none!important}html.crintro-wait{overflow:auto}html.crintro-wait [data-crintro-hold],html.crintro-wait [data-crintro-hold] *{animation-play-state:running!important}`}</style>
         </noscript>
         <LangProvider>
-          <Nav />
-          {children}
-          <Footer />
-          <Motion />
+          <CartProvider>
+            <Nav />
+            {children}
+            <Footer />
+            <Motion />
+          </CartProvider>
         </LangProvider>
       </body>
     </html>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Mat, useLang } from "./Lang";
 import { Leaf } from "./Nav";
 import { plantNotes, plantUi } from "@/lib/plants";
+import { useCart } from "./Cart";
 
 /* ---------- Ticker ---------- */
 export function Ticker() {
@@ -206,10 +207,12 @@ function Corner({ className }: { className: string }) {
 
 function ProductCard({ p, i, addLabel, addedLabel }: { p: { tag: string; name: string; desc: string; price: string; img: string }; i: number; addLabel: string; addedLabel: string }) {
   const [added, setAdded] = useState(false);
+  const cart = useCart();
   const add = () => {
-    window.dispatchEvent(new Event("bag:add"));
+    cart.add(i);
     setAdded(true);
     setTimeout(() => setAdded(false), 1600);
+    setTimeout(() => cart.setBagOpen(true), 450);
   };
   return (
     <article className="card reveal" style={{ "--k": i } as CSSProperties}>

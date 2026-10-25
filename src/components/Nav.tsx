@@ -3,6 +3,7 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { LangToggle, useLang } from "./Lang";
+import { BagButton } from "./Cart";
 
 export function Leaf({ className = "" }: { className?: string }) {
   return (
@@ -16,17 +17,13 @@ export function Leaf({ className = "" }: { className?: string }) {
 export default function Nav() {
   const { t } = useLang();
   const [open, setOpen] = useState(false);
-  const [bag, setBag] = useState(0);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onAdd = () => setBag((b) => b + 1);
     const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("bag:add", onAdd);
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => {
-      window.removeEventListener("bag:add", onAdd);
       window.removeEventListener("scroll", onScroll);
     };
   }, []);
@@ -60,10 +57,8 @@ export default function Nav() {
         <LangToggle />
         <Link href="/#kollektion" className="nav-cta">
           {t.nav.cta}
-          <span className={`bag-count${bag ? " has" : ""}`} key={bag}>
-            {bag}
-          </span>
         </Link>
+        <BagButton />
         <button className={`burger${open ? " x" : ""}`} onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={open ? t.nav.close : t.nav.menu}>
           <i />
           <i />
