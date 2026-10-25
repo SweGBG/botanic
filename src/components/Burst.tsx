@@ -17,6 +17,18 @@ import { crintro, nearestFrame, onCrintro, wantFrame } from "@/lib/crintro";
  */
 const pad = (n: number) => String(n).padStart(4, "0");
 
+/** Scroll share: intro → film → the last frame holds while the brand reveals (no scroll lock — it never takes over). */
+const INTRO_END = 0.14;
+const FILM_END = 0.86;
+const REVEAL_AT = 0.88;
+
+/** Gold dust that gathers into the B monogram: start offset x/y and delay. */
+const DUST: [string, string, string][] = [
+  ["-150px", "-110px", "0s"], ["140px", "-130px", ".05s"], ["-190px", "30px", ".1s"], ["200px", "60px", ".02s"],
+  ["-80px", "150px", ".12s"], ["95px", "160px", ".08s"], ["-30px", "-180px", ".15s"], ["50px", "-170px", ".04s"],
+  ["-220px", "-20px", ".09s"], ["230px", "-15px", ".13s"], ["-130px", "130px", ".06s"], ["140px", "110px", ".11s"],
+];
+
 /** Cut-off 14:00 Mon–Fri, computed in Europe/Stockholm. */
 function ShipClock() {
   const { t } = useLang();
@@ -137,10 +149,17 @@ export default function Burst() {
       const total = r.height - window.innerHeight;
       const p = reduced ? 0 : Math.min(1, Math.max(0, total > 0 ? -r.top / total : 0));
       section.style.setProperty("--bp", p.toFixed(3));
-      // 0–14 %: intro; then the three burst lines share the rest
-      const step = p < 0.14 ? "intro" : String(Math.min(2, Math.floor(((p - 0.14) / 0.86) * 3.15)));
+      // 0–14 %: intro; the three burst lines share the film; the last frame then holds for the brand
+      const step = p < INTRO_END ? "intro" : String(Math.min(2, Math.floor(((p - INTRO_END) / (FILM_END - INTRO_END)) * 3.05)));
       if (step !== lastStep) section.dataset.step = lastStep = step;
-      target = p * Math.max(0, store.count - 1);
+      const brand = !reduced && p >= REVEAL_AT;
+      if (brand !== ("brand" in section.dataset)) {
+        if (brand) {
+          section.dataset.brand = "";
+          section.dataset.played = "";
+        } else delete section.dataset.brand;
+      }
+      target = Math.min(1, p / FILM_END) * Math.max(0, store.count - 1);
     };
 
     resize();
@@ -230,6 +249,36 @@ export default function Burst() {
             </li>
           ))}
         </ol>
+        {/* Brand reveal: on the held last frame the B monogram gathers out of gold dust, lands, and the name rises beside it */}
+        <div className="burst-brand">
+          <span className="bb-shade" aria-hidden />
+          <div className="bb-emblem" aria-hidden>
+            <span className="bb-dust">
+              {DUST.map((d, i) => (
+                <i key={i} style={{ "--x": d[0], "--y": d[1], "--dl": d[2] } as CSSProperties} />
+              ))}
+            </span>
+            <span className="bb-ring" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/img/logo-b.webp" alt="" width={230} height={240} />
+            <span className="bb-gloss" />
+          </div>
+          <div className="bb-text">
+            <p className="bb-eye">
+              <i />
+              {t.burst.brand.eyebrow}
+              <i />
+            </p>
+            <p className="bb-name">Botanicatural</p>
+            <p className="bb-sub">{t.burst.brand.sub}</p>
+            <Link href="/#kollektion" className="btn btn-gold bb-cta">
+              <span>{t.burst.brand.cta}</span>
+              <svg viewBox="0 0 24 24" aria-hidden>
+                <path d="M4 12h15M13 6l6 6-6 6" />
+              </svg>
+            </Link>
+          </div>
+        </div>
         <p className="burst-hint" aria-hidden>
           {t.burst.hint}
         </p>

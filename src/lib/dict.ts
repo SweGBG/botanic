@@ -45,6 +45,7 @@ const sv = {
     lines: ["Korken lyfter.", "Serumet frigörs.", "Sex växter. En droppe."],
     steps: ["Glasflaska i bärnsten", "Hyaluronsyra + nypon", "Sex ursprungsväxter"],
     hint: "Skrolla för att öppna",
+    brand: { eyebrow: "Botaniskt & naturligt", sub: "Från nordisk natur", cta: "Upptäck kollektionen" },
   },
   dna: {
     eyebrow: "Sex ursprungsväxter",
@@ -214,6 +215,7 @@ const en: Dict = {
     lines: ["The cap lifts.", "The serum lets go.", "Six plants. One drop."],
     steps: ["Amber glass bottle", "Hyaluronic acid + rosehip", "Six source plants"],
     hint: "Scroll to open",
+    brand: { eyebrow: "Botanical & natural", sub: "From Nordic nature", cta: "Explore the collection" },
   },
   dna: {
     eyebrow: "Six source plants",

@@ -796,7 +796,7 @@ h1 em {
    ========================================================================== */
 .burst {
   position: relative;
-  height: 420vh;
+  height: 480vh;
   background: #070906;
 }
 .burst-stage {
@@ -1053,7 +1053,7 @@ h1 em {
 }
 @media (max-width: 760px) {
   .burst {
-    height: 320vh;
+    height: 360vh;
   }
   .burst-tag {
     top: 84px;
@@ -2815,4 +2815,233 @@ html.dlg-open { overflow: hidden; }
 }
 @media (prefers-reduced-motion: reduce) {
   .plant-dlg[open], .plant-dlg.closing, .plant-fig img, .plant-halo, .plant-halo::after, .plant-text > *, .plant-rule, .plant-frame { animation: none; }
+}
+
+/* ==========================================================================
+   BRAND REVEAL — on the held last frame of the film, the B monogram gathers out of
+   gold dust beside the bottle and the name rises. No scroll lock: it never takes over.
+   ========================================================================== */
+.burst-brand {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  --ease-b: cubic-bezier(0.22, 1, 0.36, 1);
+}
+.bb-shade {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(42% 60% at 22% 50%, rgba(7, 9, 6, 0.72), rgba(7, 9, 6, 0.25) 70%, transparent);
+  opacity: 0;
+  transition: opacity 0.9s var(--ease-b);
+}
+.bb-emblem,
+.bb-text {
+  position: absolute;
+  top: 50%;
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-b);
+}
+.bb-emblem {
+  left: calc(var(--pad) + 2vw);
+  width: clamp(130px, 13vw, 220px);
+  aspect-ratio: 230 / 240;
+  translate: 0 -62%;
+  display: grid;
+  place-items: center;
+}
+.bb-text {
+  left: calc(var(--pad) + 2vw + clamp(130px, 13vw, 220px) + clamp(22px, 2.4vw, 40px));
+  translate: 0 -58%;
+  max-width: 420px;
+}
+.burst[data-brand] .bb-shade,
+.burst[data-brand] .bb-emblem,
+.burst[data-brand] .bb-text {
+  opacity: 1;
+}
+.burst[data-brand] .bb-text {
+  pointer-events: auto;
+}
+.burst[data-brand] .burst-copy,
+.burst[data-brand] .burst-steps,
+.burst[data-brand] .burst-tag {
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+/* the reveal plays once, the first time the brand appears */
+.burst:not([data-played]) .burst-brand *,
+.burst:not([data-played]) .burst-brand *::before,
+.burst:not([data-played]) .burst-brand *::after {
+  animation-play-state: paused !important;
+}
+
+.bb-emblem img {
+  position: relative;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 10px 26px rgba(0, 0, 0, 0.6));
+  animation: bbMat 1.4s 0.1s var(--ease-b) both, bbSettle 0.9s 1.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes bbMat {
+  0% { opacity: 0; transform: scale(1.1); filter: blur(14px) brightness(2) saturate(0.2); clip-path: circle(8% at 50% 50%); }
+  45% { opacity: 1; filter: blur(4px) brightness(1.4) saturate(0.6); clip-path: circle(62% at 50% 50%); }
+  100% { opacity: 1; transform: none; filter: blur(0) brightness(1) saturate(1) drop-shadow(0 10px 26px rgba(0, 0, 0, 0.6)); clip-path: circle(100% at 50% 50%); }
+}
+@keyframes bbSettle {
+  0% { translate: 0 -8px; scale: 1.05; }
+  45% { translate: 0 3px; scale: 0.98; }
+  100% { translate: 0 0; scale: 1; }
+}
+.bb-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 80%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  border: 1px solid rgba(234, 214, 162, 0.85);
+  box-shadow: 0 0 22px rgba(200, 169, 110, 0.55), inset 0 0 14px rgba(200, 169, 110, 0.35);
+  opacity: 0;
+  animation: bbRing 1.5s 1.4s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+@keyframes bbRing {
+  0% { opacity: 0.9; transform: scale(0.7); }
+  100% { opacity: 0; transform: scale(2.2); }
+}
+.bb-gloss {
+  position: absolute;
+  inset: 4%;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  -webkit-mask: radial-gradient(closest-side, #000 55%, transparent 100%);
+  mask: radial-gradient(closest-side, #000 55%, transparent 100%);
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 248, 230, 0.6) 48%, transparent 58%) 0 0 / 300% 100% no-repeat;
+  animation: bbGloss 6s 2.4s ease-in-out infinite;
+}
+@keyframes bbGloss {
+  0% { background-position: 120% 0; }
+  35%, 100% { background-position: -120% 0; }
+}
+.bb-dust {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.bb-dust i {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #f3e2b3;
+  box-shadow: 0 0 10px 3px rgba(200, 169, 110, 0.7);
+  opacity: 0;
+  animation: bbDust 1.3s calc(0.05s + var(--dl)) cubic-bezier(0.3, 0, 0.2, 1) both;
+}
+@keyframes bbDust {
+  0% { opacity: 0; translate: var(--x) var(--y); }
+  25% { opacity: 1; }
+  90% { opacity: 0.9; }
+  100% { opacity: 0; translate: 0 0; scale: 0.3; }
+}
+.bb-text > * {
+  margin: 0;
+  animation: bbRise 0.9s var(--ease-b) both;
+}
+@keyframes bbRise {
+  from { opacity: 0; transform: translateY(14px); filter: blur(6px); }
+}
+.bb-eye {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--gold);
+  animation-delay: 1.8s !important;
+}
+.bb-eye i {
+  width: 26px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold));
+}
+.bb-eye i:last-child {
+  background: linear-gradient(270deg, transparent, var(--gold));
+}
+.bb-name {
+  margin-top: 14px !important;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(38px, 4vw, 62px);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  background: linear-gradient(100deg, var(--gold-d) 0%, var(--gold-l) 28%, var(--gold) 44%, #fff6dc 50%, var(--gold) 56%, var(--gold-l) 72%, var(--gold-d) 100%) 0 0 / 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 3px 16px rgba(7, 9, 6, 0.85));
+  animation: bbRise 0.9s 1.95s var(--ease-b) both, bbSheen 7s 3s linear infinite !important;
+}
+@keyframes bbSheen {
+  0% { background-position: 100% 0; }
+  40%, 100% { background-position: -150% 0; }
+}
+.bb-sub {
+  margin-top: 8px !important;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(18px, 1.6vw, 24px);
+  color: var(--sage-l);
+  animation-delay: 2.15s !important;
+}
+.bb-cta {
+  margin-top: 26px !important;
+  animation-delay: 2.35s !important;
+}
+
+@media (max-width: 760px) {
+  .bb-shade {
+    background: linear-gradient(180deg, transparent 50%, rgba(7, 9, 6, 0.85) 70%);
+  }
+  .bb-emblem {
+    left: 20px;
+    top: auto;
+    bottom: 64px;
+    width: 92px;
+    translate: none;
+  }
+  .bb-text {
+    left: 128px;
+    right: 20px;
+    top: auto;
+    bottom: 60px;
+    translate: none;
+  }
+  .bb-eye {
+    display: none;
+  }
+  .bb-name {
+    margin-top: 0 !important;
+    font-size: 34px;
+  }
+  .bb-sub {
+    font-size: 17px;
+  }
+  .bb-cta {
+    margin-top: 14px !important;
+    padding: 12px 18px;
+    font-size: 11px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .burst-brand * {
+    animation: none !important;
+  }
+  .bb-dust,
+  .bb-ring {
+    display: none;
+  }
 }
