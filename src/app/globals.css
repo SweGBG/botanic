@@ -346,6 +346,20 @@ h1 em {
   border: 1px dashed rgba(200, 169, 110, 0.35);
   animation: spin 30s linear infinite;
 }
+.brand-mark {
+  width: 26px;
+  height: auto;
+  animation: markPop 1.1s 0.3s var(--ease) both;
+}
+@keyframes markPop {
+  from { opacity: 0; transform: scale(1.2); filter: blur(4px); }
+}
+.foot-mark {
+  display: block;
+  width: 44px;
+  height: auto;
+  margin-bottom: 14px;
+}
 .brand-leaf {
   width: 20px;
   height: 20px;

@@ -177,3 +177,11 @@
     display: none;
   }
 }
+
+/* B monogram (logo A, 2026-10-25): materializes out of a gold blur, then breathes */
+.mark { display: block; width: 104px; height: auto; margin: 0 auto 18px;
+  filter: drop-shadow(0 6px 22px rgba(200, 169, 110, .25));
+  animation: markIn 1.3s .1s cubic-bezier(.22, 1, .36, 1) both, markGlow 3.2s 1.6s ease-in-out infinite; }
+@keyframes markIn { from { opacity: 0; transform: scale(1.12); filter: blur(10px) brightness(1.8); } }
+@keyframes markGlow { 50% { filter: drop-shadow(0 6px 30px rgba(232, 214, 168, .45)); } }
+@media (prefers-reduced-motion: reduce) { .mark { animation: none; } }

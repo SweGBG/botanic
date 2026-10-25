@@ -39,7 +39,8 @@ export default function Nav() {
     <header className={`nav${scrolled ? " scrolled" : ""}`} data-crintro-hold>
       <Link href="/" className="brand" onClick={() => setOpen(false)}>
         <span className="brand-orb">
-          <Leaf className="brand-leaf" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="brand-mark" src="/img/logo-b-sm.webp" alt="" width={30} height={31} />
         </span>
         <span className="brand-text">
           <span className="brand-name">Botanicatural</span>

@@ -5,7 +5,7 @@ import { useLang } from "./Lang";
 import styles from "./CrintroLoader.module.css";
 
 /*
- * CRiNTRO Loader: the leaf emblem draws itself and "Botanicatural" materializes letter by letter
+ * CRiNTRO Loader: the B monogram materializes and "Botanicatural" materializes letter by letter
  * while the H3 film loads behind it. The gold thread is the real loading bar, but it never runs
  * ahead of its own animation, so with a warm cache it looks like a plain 1.9 s intro. On a slow line
  * it waits (at most MAX) for the opening of the film, then the curtain lifts. The hero's own
@@ -85,10 +85,8 @@ export default function CrintroLoader() {
       onTransitionEnd={(e) => out && e.target === root.current && setGone(true)}
     >
       <div className={styles.inner}>
-        <svg className={styles.leaf} viewBox="0 0 40 40">
-          <path pathLength={1} d="M8 32 C 8 14, 20 6, 34 6 C 34 22, 24 32, 8 32 Z" />
-          <path pathLength={1} className={styles.vein} d="M8 32 L 26 14 M15 25 l 0 -6 M20 20 l 0 -5 M15 25 l 6 0 M20 20 l 5 0" />
-        </svg>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className={styles.mark} src="/img/logo-b.webp" alt="" width={120} height={125} />
         <div className={styles.word}>
           {WORD.map((w, wi) => (
             <span key={w} className={wi === 1 ? styles.accent : undefined}>

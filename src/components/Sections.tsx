@@ -308,7 +308,11 @@ export function Footer() {
       </div>
       <div className="foot-top">
         <div className="foot-brand">
-          <div className="foot-name">Botanicatural</div>
+          <div className="foot-name">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="foot-mark" src="/img/logo-b-sm.webp" alt="" width={44} height={46} />
+            Botanicatural
+          </div>
           <p>{t.footer.tagline}</p>
           <div className="social">
             {["Ig", "Tt", "Pi"].map((s) => (
