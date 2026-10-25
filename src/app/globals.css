@@ -2647,7 +2647,7 @@ html.dlg-open { overflow: hidden; }
   display: grid;
   grid-template-columns: 0.85fr 1.15fr;
   max-height: calc(100dvh - 32px);
-  overflow: auto;
+  overflow: hidden;
   border-radius: 6px;
   background:
     radial-gradient(70% 60% at 22% 40%, rgba(74, 90, 58, 0.35), transparent 70%),
@@ -2747,7 +2747,19 @@ html.dlg-open { overflow: hidden; }
 }
 .plant-fig figcaption span { font-size: 13px; letter-spacing: 0.18em; color: var(--gold); }
 
-.plant-text { padding: 58px 56px 46px 50px; }
+.plant-text { max-height: calc(100dvh - 32px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--moss2) transparent; padding: 58px 56px 46px 50px; }
+/* Short desktop screens: tighten the card so it fits without scrolling */
+@media (min-width: 821px) and (max-height: 900px) {
+  .plant-text { padding: 40px 50px 34px 44px; }
+  .plant-name { font-size: clamp(36px, 3.6vw, 48px); margin-top: 10px; }
+  .plant-rule { margin: 16px 0 12px; }
+  .plant-body { margin-top: 12px; font-size: 15px; line-height: 1.65; }
+  .plant-facts { margin-top: 18px; }
+  .plant-did { margin-top: 16px; padding: 12px 16px; }
+  .plant-nav { margin-top: 18px; }
+  .plant-fig { min-height: 0; }
+  .plant-fig img { height: min(340px, 52dvh); }
+}
 .plant-text > * { animation: plantRise 0.8s var(--ease) both; }
 .plant-text > :nth-child(1) { animation-delay: 0.15s; }
 .plant-text > :nth-child(2) { animation-delay: 0.22s; }
@@ -2792,7 +2804,8 @@ html.dlg-open { overflow: hidden; }
 .plant-dots i.on { width: 22px; border-radius: 3px; background: var(--gold); }
 
 @media (max-width: 820px) {
-  .plant-card { grid-template-columns: 1fr; border: 1px solid var(--line); }
+  .plant-card { grid-template-columns: 1fr; border: 1px solid var(--line); overflow: auto; }
+  .plant-text { max-height: none; overflow: visible; }
   .plant-frame { display: none; }
   .plant-fig { min-height: 0; padding: 48px 24px 64px; border-right: 0; border-bottom: 1px solid var(--line); }
   .plant-fig img { height: 220px; }

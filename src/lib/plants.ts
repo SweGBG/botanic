@@ -7,7 +7,7 @@ export type PlantNote = {
   did: string;
 };
 
-const IMG = ["rosehip", "babchi", "marula", "birch", "tea", "buckthorn"].map((n) => `/img/plants/${n}.webp`);
+const IMG = ["rosehip", "babchi", "marula", "birch", "tea", "buckthorn"].map((n) => `/img/plants-photo/${n}.webp`);
 
 const sv: PlantNote[] = [
   {
